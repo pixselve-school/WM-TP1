@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
   NotFoundException,
   Param,
   Post,
@@ -12,62 +11,51 @@ import {
 import { User } from './user.entity';
 import { CreateUser } from './createUser.dto';
 import { UpdateUser } from './updateUser.dto';
-
-let users: User[] = [
-  {
-    id: 0,
-    lastname: 'Doe',
-    firstname: 'John',
-  },
-];
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
   @Get()
   getAll(): User[] {
-    return users;
+    return this.usersService.findAll();
   }
 
   @Get(':id')
   getOneUser(@Param('id') id: string): User {
-    const user = users.find((value) => value.id === parseInt(id));
-    if (user === undefined) {
-      throw new NotFoundException();
+    const user = this.usersService.findOneById(parseInt(id));
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
     return user;
   }
 
   @Put(':id')
   updateOneUser(@Param('id') id: string, @Body() data: UpdateUser): User {
-    const user = users.find((value) => value.id === parseInt(id));
-    if (user === undefined) {
-      throw new NotFoundException();
+    // check if the user exists
+    const user = this.usersService.findOneById(parseInt(id));
+    // if not, return error
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
-    if (data.lastname !== undefined) {
-      user.lastname = data.lastname;
-    }
-    if (data.firstname !== undefined) {
-      user.firstname = data.firstname;
-    }
-    return user;
+    return this.usersService.update(parseInt(id), data);
   }
 
   @Delete(':id')
   deleteOneUser(@Param('id') id: string): User {
-    const user = users.find((value) => value.id === parseInt(id));
-    if (user === undefined) {
-      throw new NotFoundException();
+    // check if the user exists
+    const user = this.usersService.findOneById(parseInt(id));
+    // if not, return error
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
-    users = users.filter((value) => value.id !== parseInt(id));
+    this.usersService.delete(parseInt(id));
     return user;
   }
 
   @Post()
-  create(@Body() input: CreateUser): User {
-    const user = new User(users.length, input.firstname, input.lastname);
-    users.push(user);
-    console.log(input);
-    console.log(users);
-    return user;
+  create(@Body() { firstname, lastname, age }: CreateUser): User {
+    return this.usersService.create(firstname, lastname, age);
   }
 }
