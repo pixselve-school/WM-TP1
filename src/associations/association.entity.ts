@@ -1,7 +1,20 @@
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from '../users/user.entity';
+
+@Entity()
 export default class Association {
-  constructor(
-    public readonly id: number,
-    public idUsers: number[],
-    public name: string,
-  ) {}
+  @PrimaryGeneratedColumn()
+  id: number;
+  @Column()
+  name: string;
+  @ManyToMany(() => User)
+  @JoinTable()
+  users: User[];
 }
