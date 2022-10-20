@@ -1,51 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './user.entity';
 import { UpdateUser } from './updateUser.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  users: User[] = [
-    {
-      id: 0,
-      lastname: 'Doe',
-      firstname: 'John',
-      age: 23,
-    },
-  ];
+  constructor(
+    @InjectRepository(User) private readonly repository: Repository<User>,
+  ) {}
 
   /**
    * Create a new user.
-   * @param firstName the first name
-   * @param lastName the last name
+   * @param firstname
+   * @param lastname
    * @param age the age
    */
-  create(firstName: string, lastName: string, age: number) {
-    const user = new User(this.users.length, firstName, lastName, age);
-    this.users.push(user);
-    return user;
+  async create(
+    firstname: string,
+    lastname: string,
+    age: number,
+  ): Promise<User> {
+    return this.repository.create({ age, lastname, firstname });
   }
 
   /**
    * Delete the user with the given user id.
    * @param userId the user id
    */
-  delete(userId: number) {
-    this.users = this.users.filter((user) => user.id !== userId);
+  async delete(userId: number): Promise<void> {
+    await this.repository.delete({ id: userId });
   }
 
   /**
    * Get all the users.
    */
-  findAll() {
-    return this.users;
+  async findAll(): Promise<User[]> {
+    return this.repository.find();
   }
 
   /**
    * Find one user by id.
    * @param userId the user id
    */
-  findOneById(userId: number) {
-    return this.users.find((user) => user.id === userId);
+  async findOneById(userId: number): Promise<User | null> {
+    return this.repository.findOneBy({ id: userId });
   }
 
   /**
@@ -53,14 +52,11 @@ export class UsersService {
    * @param id the user id
    * @param data the data to update
    */
-  update(id: number, data: UpdateUser) {
-    const user = this.findOneById(id);
-    if (data.firstname) {
-      user.firstname = data.lastname;
-    }
-    if (data.lastname) {
-      user.lastname = data.lastname;
-    }
-    return user;
+  async update(id: number, data: UpdateUser) {
+    await this.repository.update({ id }, data);
+  }
+
+  async findManyById(ids: number[]): Promise<User[]> {
+    return this.repository.findBy({ id: In(ids) });
   }
 }
