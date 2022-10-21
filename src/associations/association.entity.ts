@@ -14,7 +14,7 @@ export default class Association {
   id: number;
   @Column()
   name: string;
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, { eager: true })
   @JoinTable()
   users: User[];
 }

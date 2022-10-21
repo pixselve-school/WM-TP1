@@ -15,10 +15,27 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('create user', async () => {
+    const response = await request(app.getHttpServer()).post('/users').send({
+      firstname: 'John',
+      lastname: 'Doe',
+      age: 23,
+    });
+    expect(response.statusCode).toEqual(201);
+    expect(response.body.firstname).toEqual('John');
+    expect(response.body.lastname).toEqual('Doe');
+    expect(response.body.age).toEqual(23);
+    expect(response.body.id).toBeDefined();
+  });
+
+  it('create association', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/associations')
+      .send({
+        name: 'Association',
+        idUsers: [1, 2],
+      });
+    expect(response.statusCode).toEqual(201);
+    expect(response.body.name).toEqual('Association');
   });
 });

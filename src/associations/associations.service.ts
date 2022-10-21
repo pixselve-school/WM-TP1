@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import Association from './association.entity';
-import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AssociationsService {
   constructor(
-    @InjectRepository(User)
+    @InjectRepository(Association)
     private readonly repository: Repository<Association>,
-    private readonly service: UsersService,
+    private readonly userService: UsersService,
   ) {}
 
   async getAssociations(): Promise<Association[]> {
@@ -30,14 +30,22 @@ export class AssociationsService {
   }
 
   async getMembers(id: number): Promise<User[]> {
-    return this.repository.findOneBy({ id }).then((value) => value.users);
+    return this.repository
+      .findOneBy({ id })
+      .then((value) => value?.users ?? []);
   }
 
   async createAssociation(
     name: string,
     idUsers: number[],
   ): Promise<Association> {
-    const users = await this.service.findManyById(idUsers);
-    return this.repository.create({ name, users });
+    const users = await this.userService.findManyById(idUsers);
+
+    const result = new Association();
+    result.name = name;
+    result.users = users;
+
+    await this.repository.insert(result);
+    return result;
   }
 }

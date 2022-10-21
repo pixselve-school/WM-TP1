@@ -18,12 +18,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  getAll(): User[] {
+  async getAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  getOneUser(@Param('id') id: string): User {
+  async getOneUser(@Param('id') id: string): Promise<User> {
     const user = this.usersService.findOneById(parseInt(id));
     if (!user) {
       throw new NotFoundException('User not found');
@@ -32,7 +32,10 @@ export class UsersController {
   }
 
   @Put(':id')
-  updateOneUser(@Param('id') id: string, @Body() data: UpdateUser): User {
+  async updateOneUser(
+    @Param('id') id: string,
+    @Body() data: UpdateUser,
+  ): Promise<void> {
     // check if the user exists
     const user = this.usersService.findOneById(parseInt(id));
     // if not, return error
@@ -43,19 +46,21 @@ export class UsersController {
   }
 
   @Delete(':id')
-  deleteOneUser(@Param('id') id: string): User {
+  async deleteOneUser(@Param('id') id: string): Promise<User> {
     // check if the user exists
     const user = this.usersService.findOneById(parseInt(id));
     // if not, return error
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    this.usersService.delete(parseInt(id));
+    await this.usersService.delete(parseInt(id));
     return user;
   }
 
   @Post()
-  create(@Body() { firstname, lastname, age }: CreateUser): User {
+  async create(
+    @Body() { firstname, lastname, age }: CreateUser,
+  ): Promise<User> {
     return this.usersService.create(firstname, lastname, age);
   }
 }

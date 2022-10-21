@@ -21,7 +21,9 @@ export class UsersService {
     lastname: string,
     age: number,
   ): Promise<User> {
-    return this.repository.create({ age, lastname, firstname });
+    const user = this.repository.create({ age, lastname, firstname });
+    await this.repository.insert(user);
+    return user;
   }
 
   /**
