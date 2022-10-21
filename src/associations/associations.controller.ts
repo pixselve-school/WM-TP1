@@ -12,7 +12,12 @@ import { AssociationsService } from './associations.service';
 import UpdateAssociation from './updateAssociation.dto';
 import CreateAssociation from './createAssociation.dto';
 import { UsersService } from '../users/users.service';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('associations')
 @Controller('associations')
@@ -22,11 +27,14 @@ export class AssociationsController {
     private readonly usersService: UsersService,
   ) {}
 
+  @ApiOkResponse({ description: 'All the associations.' })
   @Get()
   async getAssociations() {
     return this.associationsService.getAssociations();
   }
 
+  @ApiOkResponse({ description: 'The association.' })
+  @ApiNotFoundResponse({ description: 'Association not found.' })
   @Get(':id')
   async getOneAssociation(@Param('id') id: string) {
     const idParsed = parseInt(id);
@@ -37,6 +45,8 @@ export class AssociationsController {
     return association;
   }
 
+  @ApiOkResponse({ description: 'The association has been deleted.' })
+  @ApiNotFoundResponse({ description: 'Association not found.' })
   @Delete(':id')
   async deleteAssociation(@Param('id') id: string) {
     const idParsed = parseInt(id);
@@ -47,6 +57,8 @@ export class AssociationsController {
     }
   }
 
+  @ApiOkResponse({ description: 'The association has been updated.' })
+  @ApiNotFoundResponse({ description: 'Association not found.' })
   @Put(':id')
   async updateAssociation(
     @Param('id') id: string,
@@ -69,6 +81,8 @@ export class AssociationsController {
     return this.associationsService.updateAssociation(idParsed, association);
   }
 
+  @ApiOkResponse({ description: 'The members of the association.' })
+  @ApiNotFoundResponse({ description: 'Association not found.' })
   @Get(':id/members')
   async getMembers(@Param('id') id: string) {
     const idParsed = parseInt(id);
@@ -79,6 +93,7 @@ export class AssociationsController {
     return members;
   }
 
+  @ApiCreatedResponse({ description: 'The association has been created.' })
   @Post()
   async createAssociation(@Body() { name, idUsers }: CreateAssociation) {
     return this.associationsService.createAssociation(name, idUsers);
