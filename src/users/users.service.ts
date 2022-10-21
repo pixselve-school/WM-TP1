@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './user.entity';
 import { UpdateUser } from './updateUser.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -51,11 +51,13 @@ export class UsersService {
 
   /**
    * Update user details (first name or last name).
-   * @param id the user id
+   * @param user the user
    * @param data the data to update
    */
-  async update(id: number, data: UpdateUser) {
-    await this.repository.update({ id }, data);
+  async update(user: User, data: UpdateUser): Promise<User> {
+    const updatedUser = this.repository.merge(user, data);
+    await this.repository.save(updatedUser);
+    return updatedUser;
   }
 
   async findManyById(ids: number[]): Promise<User[]> {

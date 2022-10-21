@@ -48,14 +48,15 @@ export class UsersController {
   async updateOneUser(
     @Param('id') id: string,
     @Body() data: UpdateUser,
-  ): Promise<void> {
+  ): Promise<User> {
     // check if the user exists
     const user = await this.usersService.findOneById(parseInt(id));
     // if not, return error
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.usersService.update(parseInt(id), data);
+    console.log(user);
+    return this.usersService.update(user, data);
   }
 
   @ApiOkResponse({
