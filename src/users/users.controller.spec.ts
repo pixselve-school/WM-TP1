@@ -47,6 +47,7 @@ describe('UsersController', () => {
           firstname: 'John',
           lastname: 'Doe',
           age: 23,
+          password: 'password',
         },
       ]);
 
@@ -62,6 +63,7 @@ describe('UsersController', () => {
         firstname: 'John',
         lastname: 'Doe',
         age: 23,
+        password: 'password',
       };
 
       jest.spyOn(service, 'findOneById').mockImplementation(() => {
@@ -78,6 +80,7 @@ describe('UsersController', () => {
         firstname: 'John',
         lastname: 'Doe',
         age: 23,
+        password: 'password',
       };
 
       const base = {
@@ -85,6 +88,7 @@ describe('UsersController', () => {
         firstname: 'June',
         lastname: 'Did',
         age: 21,
+        password: 'password',
       };
 
       jest.spyOn(service, 'findOneById').mockImplementation((id) => {
@@ -112,6 +116,7 @@ describe('UsersController', () => {
         firstname: 'John',
         lastname: 'Doe',
         age: 23,
+        password: 'password',
       };
 
       jest.spyOn(service, 'findOneById').mockImplementation(() => {
@@ -139,6 +144,7 @@ describe('UsersController', () => {
         firstname: 'John',
         lastname: 'Doe',
         age: 23,
+        password: 'password',
       };
 
       jest.spyOn(service, 'create').mockImplementation(() => {
@@ -149,6 +155,7 @@ describe('UsersController', () => {
           firstname: 'John',
           lastname: 'Doe',
           age: 23,
+          password: 'password',
         }),
       ).toBe(expected);
     });

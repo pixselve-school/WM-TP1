@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from './user.entity';
 import { CreateUser } from './createUser.dto';
@@ -19,7 +20,9 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
@@ -82,8 +85,8 @@ export class UsersController {
   })
   @Post()
   async create(
-    @Body() { firstname, lastname, age }: CreateUser,
+    @Body() { firstname, lastname, age, password }: CreateUser,
   ): Promise<User> {
-    return this.usersService.create(firstname, lastname, age);
+    return this.usersService.create(firstname, lastname, age, password);
   }
 }

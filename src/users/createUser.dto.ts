@@ -19,4 +19,10 @@ export class CreateUser {
     type: Number,
   })
   age: number;
+  @ApiProperty({
+    description: 'The password of the user',
+    example: 'password',
+    type: String,
+  })
+  password: string;
 }

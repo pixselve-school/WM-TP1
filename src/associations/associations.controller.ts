@@ -6,7 +6,7 @@ import {
   NotFoundException,
   Param,
   Post,
-  Put,
+  Put, UseGuards,
 } from '@nestjs/common';
 import { AssociationsService } from './associations.service';
 import UpdateAssociation from './updateAssociation.dto';
@@ -18,7 +18,9 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('associations')
 @Controller('associations')
 export class AssociationsController {
