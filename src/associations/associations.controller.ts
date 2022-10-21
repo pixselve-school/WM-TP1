@@ -12,7 +12,9 @@ import { AssociationsService } from './associations.service';
 import UpdateAssociation from './updateAssociation.dto';
 import CreateAssociation from './createAssociation.dto';
 import { UsersService } from '../users/users.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('associations')
 @Controller('associations')
 export class AssociationsController {
   constructor(

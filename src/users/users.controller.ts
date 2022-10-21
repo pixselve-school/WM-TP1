@@ -12,7 +12,9 @@ import { User } from './user.entity';
 import { CreateUser } from './createUser.dto';
 import { UpdateUser } from './updateUser.dto';
 import { UsersService } from './users.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
