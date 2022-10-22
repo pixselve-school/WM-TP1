@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import Association from './associations/association.entity';
 import { Role } from './roles/entities/role.entity';
+import { MinutesModule } from './minutes/minutes.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { Role } from './roles/entities/role.entity';
     }),
     AuthModule,
     RolesModule,
+    MinutesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
