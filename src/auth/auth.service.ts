@@ -15,7 +15,7 @@ export class AuthService {
     id: number,
     password: string,
   ): Promise<User | undefined> {
-    const user = await this.userService.findOneById(id);
+    const user = await this.userService.findOne(id);
     if (!user) return undefined;
     if (await bcrypt.compare(password, user.password)) return user;
     return undefined;

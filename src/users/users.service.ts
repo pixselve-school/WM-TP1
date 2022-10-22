@@ -53,7 +53,7 @@ export class UsersService {
    * Find one user by id.
    * @param userId the user id
    */
-  async findOneById(userId: number): Promise<User | null> {
+  async findOne(userId: number): Promise<User | null> {
     return this.repository.findOneBy({ id: userId });
   }
 

@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -8,6 +9,7 @@ import {
   Post,
   Put,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { User } from './user.entity';
 import { CreateUser } from './createUser.dto';
@@ -22,7 +24,6 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
-@UseGuards(AuthGuard('jwt'))
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
@@ -30,7 +31,7 @@ export class UsersController {
 
   @ApiOkResponse({ description: 'All the users.' })
   @Get()
-  async getAll(): Promise<User[]> {
+  async getAll() {
     return this.usersService.findAll();
   }
 
@@ -38,7 +39,7 @@ export class UsersController {
   @ApiNotFoundResponse({ description: 'User not found.' })
   @Get(':id')
   async getOneUser(@Param('id') id: string): Promise<User> {
-    const user = await this.usersService.findOneById(parseInt(id));
+    const user = await this.usersService.findOne(parseInt(id));
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -48,12 +49,13 @@ export class UsersController {
   @ApiOkResponse({ description: 'The user has been successfully updated.' })
   @ApiNotFoundResponse({ description: 'User not found.' })
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
   async updateOneUser(
     @Param('id') id: string,
     @Body() data: UpdateUser,
   ): Promise<User> {
     // check if the user exists
-    const user = await this.usersService.findOneById(parseInt(id));
+    const user = await this.usersService.findOne(parseInt(id));
     // if not, return error
     if (!user) {
       throw new NotFoundException('User not found');
@@ -69,9 +71,10 @@ export class UsersController {
     description: 'User not found',
   })
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   async deleteOneUser(@Param('id') id: string): Promise<User> {
     // check if the user exists
-    const user = await this.usersService.findOneById(parseInt(id));
+    const user = await this.usersService.findOne(parseInt(id));
     // if not, return error
     if (!user) {
       throw new NotFoundException('User not found');

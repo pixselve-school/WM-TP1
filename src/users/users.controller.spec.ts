@@ -66,7 +66,7 @@ describe('UsersController', () => {
         password: 'password',
       };
 
-      jest.spyOn(service, 'findOneById').mockImplementation(() => {
+      jest.spyOn(service, 'findOne').mockImplementation(() => {
         return Promise.resolve(expected);
       });
       expect(await controller.getOneUser('0')).toBe(expected);
@@ -91,7 +91,7 @@ describe('UsersController', () => {
         password: 'password',
       };
 
-      jest.spyOn(service, 'findOneById').mockImplementation((id) => {
+      jest.spyOn(service, 'findOne').mockImplementation((id) => {
         return Promise.resolve(base);
       });
       jest.spyOn(service, 'update').mockImplementation(() => {
@@ -100,7 +100,7 @@ describe('UsersController', () => {
       expect(await controller.updateOneUser('0', expected)).toBe(expected);
     });
     it('should throw when user is not found', async () => {
-      jest.spyOn(service, 'findOneById').mockImplementation(() => {
+      jest.spyOn(service, 'findOne').mockImplementation(() => {
         return null;
       });
       expect(async () => {
@@ -119,7 +119,7 @@ describe('UsersController', () => {
         password: 'password',
       };
 
-      jest.spyOn(service, 'findOneById').mockImplementation(() => {
+      jest.spyOn(service, 'findOne').mockImplementation(() => {
         return Promise.resolve(expected);
       });
       jest.spyOn(service, 'delete').mockImplementation(async () => {
@@ -128,7 +128,7 @@ describe('UsersController', () => {
       expect(await controller.deleteOneUser('0')).toBe(expected);
     });
     it('should throw when user is not found', async () => {
-      jest.spyOn(service, 'findOneById').mockImplementation(() => {
+      jest.spyOn(service, 'findOne').mockImplementation(() => {
         return null;
       });
       expect(async () => {

@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
-@UseGuards(AuthGuard('jwt'))
+// @UseGuards(AuthGuard('jwt'))
 @ApiTags('associations')
 @Controller('associations')
 export class AssociationsController {
@@ -40,7 +40,7 @@ export class AssociationsController {
   @Get(':id')
   async getOneAssociation(@Param('id') id: string) {
     const idParsed = parseInt(id);
-    const association = this.associationsService.getOneAssociation(idParsed);
+    const association = this.associationsService.findOne(idParsed);
     if (association === undefined) {
       throw new NotFoundException('Association not found');
     }
@@ -52,7 +52,7 @@ export class AssociationsController {
   @Delete(':id')
   async deleteAssociation(@Param('id') id: string) {
     const idParsed = parseInt(id);
-    if (await this.associationsService.getOneAssociation(idParsed)) {
+    if (await this.associationsService.findOne(idParsed)) {
       return this.associationsService.deleteAssociation(idParsed);
     } else {
       throw new NotFoundException('Association not found');
@@ -67,7 +67,7 @@ export class AssociationsController {
     @Body() data: UpdateAssociation,
   ) {
     const idParsed = parseInt(id);
-    const association = await this.associationsService.getOneAssociation(
+    const association = await this.associationsService.findOne(
       idParsed,
     );
     if (association === undefined) {
