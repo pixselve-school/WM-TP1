@@ -10,6 +10,7 @@ import { RolesModule } from './roles/roles.module';
 import Association from './associations/association.entity';
 import { Role } from './roles/entities/role.entity';
 import { MinutesModule } from './minutes/minutes.module';
+import { Minute } from './minutes/entities/minute.entity';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { MinutesModule } from './minutes/minutes.module';
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'mydatabase.db',
-      entities: [User, Association, Role],
+      entities: [User, Association, Role, Minute],
       synchronize: true,
     }),
     AuthModule,
