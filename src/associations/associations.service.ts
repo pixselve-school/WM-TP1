@@ -21,6 +21,11 @@ export class AssociationsService {
     await this.repository.delete({ id });
   }
 
+  /**
+   * Find one association by id.
+   * @param id the association id
+   * @returns the association or null if not found
+   */
   async findOne(id: number): Promise<Association> {
     return this.repository.findOneBy({ id });
   }
