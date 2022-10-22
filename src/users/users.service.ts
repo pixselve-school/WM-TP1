@@ -71,6 +71,11 @@ export class UsersService {
     return updatedUser;
   }
 
+  /**
+   * Find many users by their ids.
+   * @param ids the ids
+   * @returns the users found or an empty array if none found
+   */
   async findManyById(ids: number[]): Promise<User[]> {
     return this.repository.findBy({ id: In(ids) });
   }
