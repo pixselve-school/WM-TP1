@@ -18,6 +18,9 @@ const AppDataSource = new DataSource({
   entities: [User, Association, Role],
 });
 
+const associationRepository = AppDataSource.getRepository(Association);
+const usersRepository = AppDataSource.getRepository(User);
+
 beforeAll(async () => {
   await AppDataSource.initialize();
 });
@@ -136,6 +139,47 @@ describe('AppController (e2e)', () => {
         expect(response.body[0].name).toBe('role1');
         expect(response.body[0].userId).toBe(1);
         expect(response.body[0].associationId).toBe(1);
+      });
+    });
+
+    describe('minutes', function () {
+      beforeEach(async () => {
+        const association = new Association();
+        association.name = 'Association';
+        await associationRepository.save(association);
+
+        const user1 = new User();
+        user1.firstname = 'John';
+        user1.lastname = 'Doe';
+        user1.age = 23;
+        user1.password = 'password';
+        const user2 = new User();
+        user2.firstname = 'John';
+        user2.lastname = 'Doe';
+        user2.age = 23;
+        user2.password = 'password';
+
+        await Promise.all([
+          usersRepository.save(user1),
+          usersRepository.save(user2),
+        ]);
+      });
+
+      it('should create a minute', async function () {
+        const response = await request(app.getHttpServer())
+          .post('/minutes')
+          .send({
+            content:
+              'Remember: scraped sausages taste best when sliceed in a wok enameled with cumin.',
+            date: '01/01/2000',
+            idAssociation: 1,
+            idVoters: [1, 2],
+          });
+        expect(response.statusCode).toBe(201);
+        expect(response.body.content).toBe(
+          'Remember: scraped sausages taste best when sliceed in a wok enameled with cumin.',
+        );
+        expect(response.body.voters.length).toBe(2);
       });
     });
   });
