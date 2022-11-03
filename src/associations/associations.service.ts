@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import Association from './entities/association.entity';
 import { User } from '../users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,33 +13,72 @@ export class AssociationsService {
     private readonly userService: UsersService,
   ) {}
 
+  /**
+   * Get all associations.
+   */
   async getAssociations(): Promise<Association[]> {
     return this.repository.find();
   }
 
-  async deleteAssociation(id: number): Promise<void> {
-    await this.repository.delete({ id });
+  /**
+   * Delete an association by id.
+   * @param id the association id
+   * @returns the deleted association
+   * @throws {NotFoundException} if the association is not found
+   */
+  async deleteAssociation(id: number): Promise<Association> {
+    const association = await this.findOne(id);
+    return this.repository.remove(association);
   }
 
   /**
    * Find one association by id.
    * @param id the association id
-   * @returns the association or null if not found
+   * @returns the association
+   * @throws {NotFoundException} if the association is not found
    */
   async findOne(id: number): Promise<Association> {
-    return this.repository.findOneBy({ id });
+    const association = await this.repository.findOneBy({ id });
+    if (!association) {
+      throw new NotFoundException(`Association ${id} not found`);
+    }
+    return association;
   }
 
-  async updateAssociation(id: number, association: Association): Promise<void> {
-    await this.repository.update({ id }, association);
+  /**
+   * Update an association by id.
+   * @param id the association id
+   * @param association the data to update
+   * @returns the updated association
+   * @throws {NotFoundException} if the association is not found
+   */
+  async updateAssociation(
+    id: number,
+    association: Association,
+  ): Promise<Association> {
+    const associationToUpdate = await this.findOne(id);
+    associationToUpdate.name = association.name;
+    associationToUpdate.users = association.users;
+    return this.repository.save(associationToUpdate);
   }
 
+  /**
+   * Get the users of an association.
+   * @param id the association id
+   * @returns the users of the association
+   */
   async getMembers(id: number): Promise<User[]> {
     return this.repository
       .findOneBy({ id })
       .then((value) => value?.users ?? []);
   }
 
+  /**
+   * Create a new association.
+   * @param name the name of the association
+   * @param idUsers the users ids of the association
+   * @returns the created association
+   */
   async createAssociation(
     name: string,
     idUsers: number[],
