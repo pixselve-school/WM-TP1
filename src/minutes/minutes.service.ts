@@ -55,8 +55,8 @@ export class MinutesService {
    * @returns the minute
    * @throws {NotFoundException} if the minute does not exist
    */
-  findOne(id: number): Promise<Minute | null> {
-    const minute = this.repository.findOne({ where: { id } });
+  async findOne(id: number): Promise<Minute | null> {
+    const minute = await this.repository.findOne({ where: { id } });
     if (minute === null) {
       throw new NotFoundException('Minute not found');
     }
