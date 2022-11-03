@@ -18,6 +18,7 @@ export class RolesService {
     @InjectRepository(Role)
     private readonly repository: Repository<Role>,
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => AssociationsService))
     private readonly associationsService: AssociationsService,
   ) {}
 
@@ -53,6 +54,15 @@ export class RolesService {
    */
   async findAll(): Promise<Role[]> {
     return this.repository.find();
+  }
+
+  /**
+   * Find all roles by association
+   * @param association the association id
+   * @returns all roles
+   */
+  async findManyByAssociation(association: number): Promise<Role[]> {
+    return this.repository.find({ where: { associationId: association } });
   }
 
   /**

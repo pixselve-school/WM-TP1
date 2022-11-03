@@ -18,6 +18,10 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import AssociationDto from './dto/association.dto';
+import Association from './entities/association.entity';
+import { RolesService } from '../roles/roles.service';
+import { AssociationMember } from './dto/association.member';
 
 // @UseGuards(AuthGuard('jwt'))
 @ApiTags('associations')
@@ -26,36 +30,38 @@ export class AssociationsController {
   constructor(
     private readonly associationsService: AssociationsService,
     private readonly usersService: UsersService,
+    private rolesService: RolesService,
   ) {}
 
   @ApiOkResponse({ description: 'All the associations.' })
   @Get()
-  async getAssociations() {
-    return this.associationsService.getAssociations();
+  async getAssociations(): Promise<AssociationDto[]> {
+    const associations: Association[] =
+      await this.associationsService.getAssociations();
+    const roles = await this.rolesService.findAll();
+    const associationsDto: AssociationDto[] = associations.map(
+      (association) => {
+        return new AssociationDto().from(association, roles);
+      },
+    );
+    return associationsDto;
   }
 
   @ApiOkResponse({ description: 'The association.' })
   @ApiNotFoundResponse({ description: 'Association not found.' })
   @Get(':id')
-  async getOneAssociation(@Param('id') id: string) {
+  async getOneAssociation(@Param('id') id: string): Promise<AssociationDto> {
     const idParsed = parseInt(id);
-    const association = this.associationsService.findOne(idParsed);
-    if (association === undefined) {
-      throw new NotFoundException('Association not found');
-    }
-    return association;
+    const association = await this.associationsService.findOne(idParsed);
+    const roles = await this.rolesService.findManyByAssociation(idParsed);
+    return new AssociationDto().from(association, roles);
   }
 
   @ApiOkResponse({ description: 'The association has been deleted.' })
   @ApiNotFoundResponse({ description: 'Association not found.' })
   @Delete(':id')
   async deleteAssociation(@Param('id') id: string) {
-    const idParsed = parseInt(id);
-    if (await this.associationsService.findOne(idParsed)) {
-      return this.associationsService.deleteAssociation(idParsed);
-    } else {
-      throw new NotFoundException('Association not found');
-    }
+    return this.associationsService.deleteAssociation(+id);
   }
 
   @ApiOkResponse({ description: 'The association has been updated.' })
@@ -64,7 +70,7 @@ export class AssociationsController {
   async updateAssociation(
     @Param('id') id: string,
     @Body() data: UpdateAssociation,
-  ) {
+  ): Promise<AssociationDto> {
     const idParsed = parseInt(id);
     const association = await this.associationsService.findOne(idParsed);
     if (association === undefined) {
@@ -77,24 +83,37 @@ export class AssociationsController {
     if (data.name !== undefined) {
       association.name = data.name;
     }
-    return this.associationsService.updateAssociation(idParsed, association);
+    const associationEdited = await this.associationsService.updateAssociation(
+      idParsed,
+      association,
+    );
+    const roles = await this.rolesService.findManyByAssociation(idParsed);
+    return new AssociationDto().from(associationEdited, roles);
   }
 
   @ApiOkResponse({ description: 'The members of the association.' })
   @ApiNotFoundResponse({ description: 'Association not found.' })
   @Get(':id/members')
-  async getMembers(@Param('id') id: string) {
+  async getMembers(@Param('id') id: string): Promise<AssociationMember[]> {
     const idParsed = parseInt(id);
-    const members = this.associationsService.getMembers(idParsed);
-    if (members === null) {
-      throw new NotFoundException('Association not found');
-    }
-    return members;
+    const members = await this.associationsService.getMembers(idParsed);
+    const roles = await this.rolesService.findManyByAssociation(idParsed);
+    return members.map((member) => {
+      const role = roles.find((role) => role.associationId === idParsed);
+      return new AssociationMember().from(member, role);
+    });
   }
 
   @ApiCreatedResponse({ description: 'The association has been created.' })
   @Post()
-  async createAssociation(@Body() { name, idUsers }: CreateAssociation) {
-    return this.associationsService.createAssociation(name, idUsers);
+  async createAssociation(
+    @Body() { name, idUsers }: CreateAssociation,
+  ): Promise<AssociationDto> {
+    const association = await this.associationsService.createAssociation(
+      name,
+      idUsers,
+    );
+    const roles = await this.rolesService.findManyByAssociation(association.id);
+    return new AssociationDto().from(association, roles);
   }
 }
