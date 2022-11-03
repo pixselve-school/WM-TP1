@@ -87,7 +87,7 @@ describe('AppController (e2e)', () => {
       ]);
     });
     it('should create a new roles', async () => {
-      const response = await request(app.getHttpServer()).post('/role').send({
+      const response = await request(app.getHttpServer()).post('/roles').send({
         name: 'role1',
         idUser: 1,
         idAssociation: 1,
