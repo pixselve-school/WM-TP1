@@ -41,19 +41,70 @@ export class MinutesService {
     return this.repository.save(minute);
   }
 
-  findAll() {
-    return `This action returns all minutes`;
+  /**
+   * Find all minutes.
+   * @returns all minutes
+   */
+  findAll(): Promise<Minute[]> {
+    return this.repository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} minute`;
+  /**
+   * Find one minute by its id.
+   * @param id the id of the minute
+   * @returns the minute
+   * @throws {NotFoundException} if the minute does not exist
+   */
+  findOne(id: number): Promise<Minute | null> {
+    const minute = this.repository.findOne({ where: { id } });
+    if (minute === null) {
+      throw new NotFoundException('Minute not found');
+    }
+    return minute;
   }
 
-  update(id: number, updateMinuteDto: UpdateMinuteDto) {
-    return `This action updates a #${id} minute`;
+  /**
+   * Update a minute.
+   * @param id the id of the minute to update
+   * @param updateMinuteDto the new minute
+   * @returns the updated minute
+   * @throws {NotFoundException} if the minute or the association or the users does not exist
+   */
+  async update(id: number, updateMinuteDto: UpdateMinuteDto): Promise<Minute> {
+    // search the minute
+    const minute = await this.findOne(id);
+
+    // edit the minute
+    minute.content = updateMinuteDto.content;
+    minute.date = new Date(updateMinuteDto.date);
+    // search the association
+    const association = await this.associationsService.findOne(
+      updateMinuteDto.idAssociation,
+    );
+    if (association === null) {
+      throw new NotFoundException('Association not found');
+    }
+    minute.association = association;
+    // search the users
+    const users = await this.usersService.findManyById(
+      updateMinuteDto.idVoters,
+    );
+    if (users.length !== updateMinuteDto.idVoters.length) {
+      throw new NotFoundException('Some users not found');
+    }
+    minute.voters = users;
+    // save the minute
+    return this.repository.save(minute);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} minute`;
+  /**
+   * Delete a minute.
+   * @param id the id of the minute to delete
+   * @throws {NotFoundException} if the minute does not exist
+   * @returns the deleted minute
+   */
+  async remove(id: number): Promise<Minute> {
+    const minute = await this.findOne(id);
+    return this.repository.remove(minute);
   }
 }
