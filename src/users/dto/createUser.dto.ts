@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, Min } from 'class-validator';
-import { Exclude } from 'class-transformer';
+import { IsNotEmpty } from 'class-validator';
 
 export class CreateUser {
   @ApiProperty({

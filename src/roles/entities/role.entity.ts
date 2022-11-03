@@ -1,5 +1,5 @@
-import { User } from '../../users/user.entity';
-import Association from '../../associations/association.entity';
+import { User } from '../../users/entities/user.entity';
+import Association from '../../associations/entities/association.entity';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()
@@ -7,7 +7,7 @@ export class Role {
   @Column()
   name: string;
 
-  @OneToOne(() => User, {createForeignKeyConstraints: false})
+  @OneToOne(() => User, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'userId' })
   user: User;
 
@@ -17,7 +17,7 @@ export class Role {
   @PrimaryColumn({ unique: false })
   associationId: number;
 
-  @OneToOne(() => Association, {createForeignKeyConstraints: false})
+  @OneToOne(() => Association, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'associationId' })
   association: Association;
 }

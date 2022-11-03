@@ -1,6 +1,5 @@
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -9,14 +8,12 @@ import {
   Post,
   Put,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { User } from './user.entity';
-import { CreateUser } from './createUser.dto';
-import { UpdateUser } from './updateUser.dto';
+import { User } from './entities/user.entity';
+import { CreateUser } from './dto/createUser.dto';
+import { UpdateUser } from './dto/updateUser.dto';
 import { UsersService } from './users.service';
 import {
-  ApiAcceptedResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,

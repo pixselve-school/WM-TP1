@@ -8,8 +8,8 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { Reflector } from '@nestjs/core';
 import { DataSource } from 'typeorm';
-import { User } from '../src/users/user.entity';
-import Association from '../src/associations/association.entity';
+import { User } from '../src/users/entities/user.entity';
+import Association from '../src/associations/entities/association.entity';
 import { Role } from '../src/roles/entities/role.entity';
 
 const AppDataSource = new DataSource({

@@ -6,11 +6,11 @@ import {
   NotFoundException,
   Param,
   Post,
-  Put, UseGuards,
+  Put,
 } from '@nestjs/common';
 import { AssociationsService } from './associations.service';
-import UpdateAssociation from './updateAssociation.dto';
-import CreateAssociation from './createAssociation.dto';
+import UpdateAssociation from './dto/updateAssociation.dto';
+import CreateAssociation from './dto/createAssociation.dto';
 import { UsersService } from '../users/users.service';
 import {
   ApiCreatedResponse,
@@ -18,7 +18,6 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 
 // @UseGuards(AuthGuard('jwt'))
 @ApiTags('associations')
@@ -67,9 +66,7 @@ export class AssociationsController {
     @Body() data: UpdateAssociation,
   ) {
     const idParsed = parseInt(id);
-    const association = await this.associationsService.findOne(
-      idParsed,
-    );
+    const association = await this.associationsService.findOne(idParsed);
     if (association === undefined) {
       throw new NotFoundException('Association not found');
     }
