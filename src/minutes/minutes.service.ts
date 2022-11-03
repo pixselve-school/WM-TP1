@@ -75,24 +75,30 @@ export class MinutesService {
     const minute = await this.findOne(id);
 
     // edit the minute
-    minute.content = updateMinuteDto.content;
-    minute.date = new Date(updateMinuteDto.date);
-    // search the association
-    const association = await this.associationsService.findOne(
-      updateMinuteDto.idAssociation,
-    );
-    if (association === null) {
-      throw new NotFoundException('Association not found');
+    if (updateMinuteDto.content !== undefined) {
+      minute.content = updateMinuteDto.content;
     }
-    minute.association = association;
-    // search the users
-    const users = await this.usersService.findManyById(
-      updateMinuteDto.idVoters,
-    );
-    if (users.length !== updateMinuteDto.idVoters.length) {
-      throw new NotFoundException('Some users not found');
+    if (updateMinuteDto.date !== undefined) {
+      minute.date = new Date(updateMinuteDto.date);
     }
-    minute.voters = users;
+    if (updateMinuteDto.idAssociation !== undefined) {
+      const association = await this.associationsService.findOne(
+        updateMinuteDto.idAssociation,
+      );
+      if (association === null) {
+        throw new NotFoundException('Association not found');
+      }
+      minute.association = association;
+    }
+    if (updateMinuteDto.idVoters !== undefined) {
+      const users = await this.usersService.findManyById(
+        updateMinuteDto.idVoters,
+      );
+      if (users.length !== updateMinuteDto.idVoters.length) {
+        throw new NotFoundException('Some users not found');
+      }
+      minute.voters = users;
+    }
     // save the minute
     return this.repository.save(minute);
   }
