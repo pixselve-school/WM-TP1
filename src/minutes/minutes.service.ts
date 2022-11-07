@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateMinuteDto } from './dto/create-minute.dto';
 import { UpdateMinuteDto } from './dto/update-minute.dto';
 import { Repository } from 'typeorm';
@@ -11,7 +16,9 @@ import { UsersService } from '../users/users.service';
 export class MinutesService {
   constructor(
     @InjectRepository(Minute) private readonly repository: Repository<Minute>,
+    @Inject(forwardRef(() => AssociationsService))
     private readonly associationsService: AssociationsService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
 
@@ -112,5 +119,24 @@ export class MinutesService {
   async remove(id: number): Promise<Minute> {
     const minute = await this.findOne(id);
     return this.repository.remove(minute);
+  }
+
+  /**
+   * Find all minutes of an association.
+   * @param id the id of the association
+   * @param sort the sort to apply
+   * @param order the order to apply
+   */
+  async getMinutesForAssociation(
+    id: number,
+    sort = 'date',
+    order = 'DESC',
+  ): Promise<Minute[]> {
+    const sortParams = {};
+    sortParams[sort] = order;
+    return this.repository.find({
+      where: { association: { id } },
+      order: sortParams,
+    });
   }
 }

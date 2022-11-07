@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsDateString, IsNotEmpty, IsNumberString } from 'class-validator';
 
 export class CreateMinuteDto {
   @ApiProperty({
@@ -8,6 +9,7 @@ export class CreateMinuteDto {
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum et sagittis sem. Praesent sollicitudin lacus.',
     type: String,
   })
+  @IsNotEmpty()
   public content: string;
 
   @ApiProperty({
@@ -23,6 +25,8 @@ export class CreateMinuteDto {
     example: '12/12/2021',
     type: String,
   })
+  @IsNotEmpty()
+  @IsDateString()
   public date: string;
 
   @ApiProperty({
@@ -30,5 +34,7 @@ export class CreateMinuteDto {
     example: '1',
     type: Number,
   })
+  @IsNumberString()
+  @IsNotEmpty()
   public idAssociation: number;
 }

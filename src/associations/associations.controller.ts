@@ -9,6 +9,9 @@ import {
   Param,
   Post,
   Put,
+  Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AssociationsService } from './associations.service';
 import UpdateAssociation from './dto/updateAssociation.dto';
@@ -24,6 +27,9 @@ import AssociationDto from './dto/association.dto';
 import Association from './entities/association.entity';
 import { RolesService } from '../roles/roles.service';
 import { AssociationMember } from './dto/association.member';
+import { Minute } from '../minutes/entities/minute.entity';
+import { MinutesService } from '../minutes/minutes.service';
+import SortParamsDto from './dto/sortParams.dto';
 
 // @UseGuards(AuthGuard('jwt'))
 @ApiTags('associations')
@@ -35,6 +41,8 @@ export class AssociationsController {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => RolesService))
     private rolesService: RolesService,
+    @Inject(forwardRef(() => MinutesService))
+    private minutesService: MinutesService,
   ) {}
 
   @ApiOkResponse({ description: 'All the associations.' })
@@ -119,5 +127,18 @@ export class AssociationsController {
     );
     const roles = await this.rolesService.findManyByAssociation(association.id);
     return new AssociationDto().from(association, roles);
+  }
+
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOkResponse({ description: 'The minutes of the association.' })
+  @ApiNotFoundResponse({ description: 'Association not found.' })
+  @Get(':id/minutes')
+  async minutes(
+    @Param('id') id: number,
+    @Query() { order, sort }: SortParamsDto,
+  ): Promise<Minute[]> {
+    // check if association exists
+    await this.associationsService.findOne(id);
+    return this.minutesService.getMinutesForAssociation(id, sort, order);
   }
 }
