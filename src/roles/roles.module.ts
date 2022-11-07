@@ -12,7 +12,7 @@ import { AssociationsModule } from '../associations/associations.module';
   imports: [
     TypeOrmModule.forFeature([Role]),
     forwardRef(() => AssociationsModule),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   exports: [RolesService],
 })

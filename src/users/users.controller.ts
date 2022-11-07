@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Delete,
+  forwardRef,
   Get,
+  Inject,
   NotFoundException,
   Param,
   Post,
@@ -20,11 +22,17 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { Role } from '../roles/entities/role.entity';
+import { RolesService } from '../roles/roles.service';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    @Inject(forwardRef(() => RolesService))
+    private readonly rolesService: RolesService,
+  ) {}
 
   @ApiOkResponse({ description: 'All the users.' })
   @Get()
@@ -41,6 +49,16 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
     return user;
+  }
+
+  @ApiOkResponse({ description: 'The user.' })
+  @ApiNotFoundResponse({ description: 'User not found.' })
+  @Get(':id/roles')
+  async getRoles(@Param('id') id: string): Promise<Role[]> {
+    // execute function to check if user exists
+    await this.usersService.findOne(+id);
+    // return the roles
+    return this.rolesService.getRolesForUser(+id);
   }
 
   @ApiOkResponse({ description: 'The user has been successfully updated.' })

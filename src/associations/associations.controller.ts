@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Delete,
+  forwardRef,
   Get,
+  Inject,
   NotFoundException,
   Param,
   Post,
@@ -29,7 +31,9 @@ import { AssociationMember } from './dto/association.member';
 export class AssociationsController {
   constructor(
     private readonly associationsService: AssociationsService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => RolesService))
     private rolesService: RolesService,
   ) {}
 

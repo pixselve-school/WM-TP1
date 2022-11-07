@@ -17,6 +17,7 @@ export class RolesService {
   constructor(
     @InjectRepository(Role)
     private readonly repository: Repository<Role>,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => AssociationsService))
     private readonly associationsService: AssociationsService,
@@ -110,5 +111,14 @@ export class RolesService {
   async remove(user: number, association: number): Promise<Role> {
     const role: Role = await this.findOne(user, association);
     return this.repository.remove(role);
+  }
+
+  /**
+   * Get all roles by user
+   * @param user the user id
+   * @returns all roles
+   */
+  async getRolesForUser(user: number): Promise<Role[]> {
+    return this.repository.find({ where: { userId: user } });
   }
 }
