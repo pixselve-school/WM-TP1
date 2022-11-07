@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { Role } from './entities/role.entity';
 import { UsersService } from '../users/users.service';
 import { AssociationsService } from '../associations/associations.service';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class RolesService {
@@ -120,5 +121,21 @@ export class RolesService {
    */
   async getRolesForUser(user: number): Promise<Role[]> {
     return this.repository.find({ where: { userId: user } });
+  }
+
+  /**
+   * Get all users by role name
+   * @param name the role name
+   * @returns all users
+   */
+  async getUsersByRoleName(name: string): Promise<User[]> {
+    const roles = await this.repository.find({
+      where: { name },
+      relations: {
+        user: true,
+      },
+    });
+    console.log(roles);
+    return roles.map((role) => role.user);
   }
 }

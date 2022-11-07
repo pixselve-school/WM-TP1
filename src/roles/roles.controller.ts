@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
+  Controller,
+  Delete,
+  Get,
   Param,
-  Delete, Put,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -25,8 +25,16 @@ export class RolesController {
     return this.roleService.findAll();
   }
 
+  @Get('users/:name')
+  usersByRoleName(@Param('name') name: string) {
+    return this.roleService.getUsersByRoleName(name);
+  }
+
   @Get(':user/:association')
-  findOne(@Param('user') user: string, @Param('association') association: string) {
+  findOne(
+    @Param('user') user: string,
+    @Param('association') association: string,
+  ) {
     return this.roleService.findOne(+user, +association);
   }
 
@@ -40,7 +48,10 @@ export class RolesController {
   }
 
   @Delete(':user/:association')
-  remove(@Param('user') user: string, @Param('association') association: string) {
+  remove(
+    @Param('user') user: string,
+    @Param('association') association: string,
+  ) {
     return this.roleService.remove(+user, +association);
   }
 }
