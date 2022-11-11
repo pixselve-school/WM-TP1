@@ -17,6 +17,7 @@ async function bootstrap() {
   app.use(helmet());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.enableCors();
 
   await app.listen(3000);
 }
