@@ -11,7 +11,6 @@ import Association from './associations/entities/association.entity';
 import { Role } from './roles/entities/role.entity';
 import { MinutesModule } from './minutes/minutes.module';
 import { Minute } from './minutes/entities/minute.entity';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -30,19 +29,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     AuthModule,
     RolesModule,
     MinutesModule,
-    ClientsModule.register([
-      {
-        name: 'MAIL_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'requests',
-          queueOptions: {
-            durable: true,
-          },
-        },
-      },
-    ]),
   ],
   controllers: [AppController],
   providers: [AppService],

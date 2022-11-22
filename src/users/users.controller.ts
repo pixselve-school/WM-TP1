@@ -24,6 +24,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '../roles/entities/role.entity';
 import { RolesService } from '../roles/roles.service';
+import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 
 @ApiTags('users')
 @Controller('users')
@@ -32,6 +33,7 @@ export class UsersController {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => RolesService))
     private readonly rolesService: RolesService,
+    @Inject('MAIL_SERVICE') private client: ClientProxy,
   ) {}
 
   @ApiOkResponse({ description: 'All the users.' })
@@ -105,6 +107,26 @@ export class UsersController {
   async create(
     @Body() { firstname, lastname, age, password }: CreateUser,
   ): Promise<User> {
-    return this.usersService.create(firstname, lastname, age, password);
+    const created = await this.usersService.create(
+      firstname,
+      lastname,
+      age,
+      password,
+    );
+    await this.client
+      .emit(
+        'mail',
+        new RmqRecordBuilder({
+          firstName: firstname,
+          lastName: lastname,
+          email: 'mael.kerichard@etudiant.univ-rennes1.fr',
+        })
+          .setOptions({
+            contentType: 'application/json',
+          })
+          .build(),
+      )
+      .toPromise();
+    return created;
   }
 }
