@@ -25,6 +25,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { Role } from '../roles/entities/role.entity';
 import { RolesService } from '../roles/roles.service';
 import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
+import { AssociationsService } from '../associations/associations.service';
+import UserWithAssociationsDto from './dto/userWithAssociations.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -34,6 +36,8 @@ export class UsersController {
     @Inject(forwardRef(() => RolesService))
     private readonly rolesService: RolesService,
     @Inject('MAIL_SERVICE') private client: ClientProxy,
+    @Inject(forwardRef(() => AssociationsService))
+    private readonly associationsService: AssociationsService,
   ) {}
 
   @ApiOkResponse({ description: 'All the users.' })
@@ -45,12 +49,17 @@ export class UsersController {
   @ApiOkResponse({ description: 'The user.' })
   @ApiNotFoundResponse({ description: 'User not found.' })
   @Get(':id')
-  async getOneUser(@Param('id') id: string): Promise<User> {
+  async getOneUser(@Param('id') id: string): Promise<UserWithAssociationsDto> {
     const user = await this.usersService.findOne(parseInt(id));
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return user;
+    // get associations
+    const associations = await this.associationsService.getAssociationsForUser(
+      parseInt(id),
+    );
+    // return the user with associations
+    return new UserWithAssociationsDto().from(user, associations);
   }
 
   @ApiOkResponse({ description: 'The user.' })
@@ -113,20 +122,25 @@ export class UsersController {
       age,
       password,
     );
-    await this.client
-      .emit(
-        'mail',
-        new RmqRecordBuilder({
-          firstName: firstname,
-          lastName: lastname,
-          email: 'mael.kerichard@etudiant.univ-rennes1.fr',
-        })
-          .setOptions({
-            contentType: 'application/json',
+    try {
+      await this.client
+        .emit(
+          'mail',
+          new RmqRecordBuilder({
+            firstName: firstname,
+            lastName: lastname,
+            email: 'mael.kerichard@etudiant.univ-rennes1.fr',
           })
-          .build(),
-      )
-      .toPromise();
+            .setOptions({
+              contentType: 'application/json',
+            })
+            .build(),
+        )
+        .toPromise();
+    } catch (e) {
+      console.log(e);
+    }
+
     return created;
   }
 }

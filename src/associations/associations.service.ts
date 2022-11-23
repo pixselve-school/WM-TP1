@@ -84,12 +84,22 @@ export class AssociationsService {
     idUsers: number[],
   ): Promise<Association> {
     const users = await this.userService.findManyById(idUsers);
+    const association = Association.create({ name, users });
+    return this.repository.save(association);
+  }
 
-    const result = new Association();
-    result.name = name;
-    result.users = users;
-
-    await this.repository.insert(result);
-    return result;
+  /**
+   * Get the associations of a user.
+   * @param id the user id
+   * @returns the associations of the user
+   */
+  async getAssociationsForUser(id: number): Promise<Association[]> {
+    return this.repository.find({
+      where: {
+        users: {
+          id,
+        },
+      },
+    });
   }
 }

@@ -5,11 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { RolesModule } from '../roles/roles.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AssociationsModule } from '../associations/associations.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     forwardRef(() => RolesModule),
+    forwardRef(() => AssociationsModule),
     ClientsModule.register([
       {
         name: 'MAIL_SERVICE',

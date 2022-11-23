@@ -1,4 +1,5 @@
 import {
+  BaseEntity,
   Column,
   Entity,
   JoinTable,
@@ -8,7 +9,7 @@ import {
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
-export default class Association {
+export default class Association extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
