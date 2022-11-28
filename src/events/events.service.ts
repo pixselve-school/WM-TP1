@@ -1,23 +1,30 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity';
+import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
+import { AssociationsService } from '../associations/associations.service';
 
 @Injectable()
 export class EventsService {
+  private readonly logger = new Logger('EventsService');
+
   constructor(
     @InjectRepository(Event) private readonly repository: Repository<Event>,
+    @Inject('EVENT_NOTIFICATION_SERVICE') private client: ClientProxy,
+    private readonly associationsService: AssociationsService,
   ) {}
 
-  create(createEventDto: CreateEventDto) {
+  async create(createEventDto: CreateEventDto) {
     const { name, start, end, association } = createEventDto;
+    const associationInDb = await this.associationsService.findOne(association);
     const event = Event.create({
       name,
       start,
       end,
-      association: { id: association },
+      association: associationInDb,
     });
     return this.repository.save(event);
   }
@@ -51,5 +58,25 @@ export class EventsService {
   async remove(id: number) {
     const event = await this.findOne(id);
     return this.repository.remove(event);
+  }
+
+  async notify(event: Event) {
+    this.logger.debug(`Sending event notification for ${event.name}`);
+    const { name, start, end, association } = event;
+    const payload = {
+      name,
+      start,
+      end,
+      associationName: association.name,
+      attendeesEmails: association.users.map((user) => user.email),
+    };
+    await this.client
+      .emit(
+        'event_created',
+        new RmqRecordBuilder(payload)
+          .setOptions({ contentType: 'application/json' })
+          .build(),
+      )
+      .toPromise();
   }
 }
