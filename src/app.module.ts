@@ -12,6 +12,7 @@ import { Role } from './roles/entities/role.entity';
 import { MinutesModule } from './minutes/minutes.module';
 import { Minute } from './minutes/entities/minute.entity';
 import { EventsModule } from './events/events.module';
+import { Event } from './events/entities/event.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { EventsModule } from './events/events.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       port: 5432,
-      entities: [User, Association, Role, Minute],
+      entities: [User, Association, Role, Minute, Event],
       synchronize: true,
     }),
     AuthModule,
