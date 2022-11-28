@@ -11,6 +11,7 @@ import Association from './associations/entities/association.entity';
 import { Role } from './roles/entities/role.entity';
 import { MinutesModule } from './minutes/minutes.module';
 import { Minute } from './minutes/entities/minute.entity';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { Minute } from './minutes/entities/minute.entity';
     AuthModule,
     RolesModule,
     MinutesModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
