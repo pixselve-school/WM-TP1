@@ -21,7 +21,8 @@ export class Event extends BaseEntity {
   @Column()
   end: Date;
 
-  @Column()
-  @ManyToOne(() => Association, (object) => object.id)
+  @ManyToOne(() => Association, (association) => association.id, {
+    eager: true,
+  })
   association: Association;
 }
