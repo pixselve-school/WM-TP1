@@ -46,13 +46,13 @@ export class EventsService {
     const event = await this.findOne(id);
     // merge the new data with the existing data
     // this will only update the values that have been provided
-    Event.merge(event, {
+    const updatedEvent = Event.merge(event, {
       name,
       start,
       end,
       association: { id: association },
     });
-    return this.repository.save(event);
+    return this.repository.save(updatedEvent);
   }
 
   async remove(id: number) {
