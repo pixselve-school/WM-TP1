@@ -113,22 +113,15 @@ export class UsersController {
     description: 'The user has been successfully created.',
   })
   @Post()
-  async create(
-    @Body() { firstname, lastname, age, password }: CreateUser,
-  ): Promise<User> {
-    const created = await this.usersService.create(
-      firstname,
-      lastname,
-      age,
-      password,
-    );
+  async create(@Body() createUser: CreateUser): Promise<User> {
+    const created = await this.usersService.create(createUser);
     try {
       await this.client
         .emit(
           'mail',
           new RmqRecordBuilder({
-            firstName: firstname,
-            lastName: lastname,
+            firstName: createUser.firstname,
+            lastName: createUser.lastname,
             email: 'mael.kerichard@etudiant.univ-rennes1.fr',
           })
             .setOptions({
