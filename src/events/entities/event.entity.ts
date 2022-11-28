@@ -1,8 +1,14 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import Association from '../../associations/entities/association.entity';
 
 @Entity()
-export class Event {
+export class Event extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

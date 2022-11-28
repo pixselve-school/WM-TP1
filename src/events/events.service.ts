@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,22 +12,44 @@ export class EventsService {
   ) {}
 
   create(createEventDto: CreateEventDto) {
-    return 'This action adds a new event';
+    const { name, start, end, association } = createEventDto;
+    const event = Event.create({
+      name,
+      start,
+      end,
+      association: { id: association },
+    });
+    return this.repository.save(event);
   }
 
   findAll() {
-    return `This action returns all events`;
+    return this.repository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} event`;
+  async findOne(id: number) {
+    const event = await this.repository.findOne({ where: { id } });
+    if (event === null) {
+      throw new NotFoundException('Event not found');
+    }
+    return event;
   }
 
-  update(id: number, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
+  async update(id: number, updateEventDto: UpdateEventDto) {
+    const { name, start, end, association } = updateEventDto;
+    const event = await this.findOne(id);
+    // merge the new data with the existing data
+    // this will only update the values that have been provided
+    Event.merge(event, {
+      name,
+      start,
+      end,
+      association: { id: association },
+    });
+    return this.repository.save(event);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} event`;
+  async remove(id: number) {
+    const event = await this.findOne(id);
+    return this.repository.remove(event);
   }
 }
