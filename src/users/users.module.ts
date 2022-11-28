@@ -14,11 +14,11 @@ import { AssociationsModule } from '../associations/associations.module';
     forwardRef(() => AssociationsModule),
     ClientsModule.register([
       {
-        name: 'MAIL_SERVICE',
+        name: 'REGISTRATION_CONFIRMATION_SERVICE',
         transport: Transport.RMQ,
         options: {
           urls: ['amqp://localhost:5672'],
-          queue: 'requests',
+          queue: 'registration_confirmation',
           queueOptions: {
             durable: true,
           },

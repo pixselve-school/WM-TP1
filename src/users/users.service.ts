@@ -1,15 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UpdateUser } from './dto/updateUser.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUser } from './dto/createUser.dto';
+import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly repository: Repository<User>,
+    @Inject('REGISTRATION_CONFIRMATION_SERVICE') private client: ClientProxy,
   ) {}
 
   /**
@@ -17,6 +24,13 @@ export class UsersService {
    * @param createUserData the data to create the user
    */
   async create(createUserData: CreateUser): Promise<User> {
+    // check if the email is already used
+    const existingUser = await this.repository.findOneBy({
+      email: createUserData.email,
+    });
+    if (existingUser) {
+      throw new BadRequestException('email already used');
+    }
     const hashedPassword = await bcrypt.hash(createUserData.password, 10);
     const user = User.create();
     user.firstname = createUserData.firstname;
@@ -31,8 +45,9 @@ export class UsersService {
    * Delete the user with the given user id.
    * @param userId the user id
    */
-  async delete(userId: number): Promise<void> {
-    await this.repository.delete({ id: userId });
+  async delete(userId: number): Promise<User> {
+    const user = await this.findOne(userId);
+    return this.repository.remove(user);
   }
 
   /**
@@ -58,16 +73,22 @@ export class UsersService {
 
   /**
    * Update user details (first name or last name).
-   * @param user the user
+   * @param userId the user id
    * @param data the data to update
    */
-  async update(user: User, data: UpdateUser): Promise<User> {
+  async update(userId: number, data: UpdateUser): Promise<User> {
+    const user = await this.findOne(userId);
     if (data.password !== undefined) {
       data.password = await bcrypt.hash(data.password, 10);
     }
-    const updatedUser = this.repository.merge(user, data);
-    await this.repository.save(updatedUser);
-    return updatedUser;
+    // merge the data
+    const newUser = User.merge(user, {
+      firstname: data.firstname,
+      lastname: data.lastname,
+      age: data.age,
+      password: data.password,
+    });
+    return this.repository.save(newUser);
   }
 
   /**
@@ -77,5 +98,22 @@ export class UsersService {
    */
   async findManyById(ids: number[]): Promise<User[]> {
     return this.repository.findBy({ id: In(ids) });
+  }
+
+  async sendRegistrationConfirmationEmail({
+    email,
+    firstname,
+    lastname,
+  }: User): Promise<void> {
+    const record = new RmqRecordBuilder({
+      firstName: firstname,
+      lastName: lastname,
+      email,
+    })
+      .setOptions({
+        contentType: 'application/json',
+      })
+      .build();
+    await this.client.emit('registration', record).toPromise();
   }
 }

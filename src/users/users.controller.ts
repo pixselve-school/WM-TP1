@@ -5,7 +5,7 @@ import {
   forwardRef,
   Get,
   Inject,
-  NotFoundException,
+  Logger,
   Param,
   Post,
   Put,
@@ -24,7 +24,6 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '../roles/entities/role.entity';
 import { RolesService } from '../roles/roles.service';
-import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 import { AssociationsService } from '../associations/associations.service';
 import UserWithAssociationsDto from './dto/userWithAssociations.dto';
 
@@ -35,10 +34,11 @@ export class UsersController {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => RolesService))
     private readonly rolesService: RolesService,
-    @Inject('MAIL_SERVICE') private client: ClientProxy,
     @Inject(forwardRef(() => AssociationsService))
     private readonly associationsService: AssociationsService,
   ) {}
+
+  private logger = new Logger('UsersController');
 
   @ApiOkResponse({ description: 'All the users.' })
   @Get()
@@ -51,9 +51,6 @@ export class UsersController {
   @Get(':id')
   async getOneUser(@Param('id') id: string): Promise<UserWithAssociationsDto> {
     const user = await this.usersService.findOne(parseInt(id));
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
     // get associations
     const associations = await this.associationsService.getAssociationsForUser(
       parseInt(id),
@@ -80,14 +77,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() data: UpdateUser,
   ): Promise<User> {
-    // check if the user exists
-    const user = await this.usersService.findOne(parseInt(id));
-    // if not, return error
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    console.log(user);
-    return this.usersService.update(user, data);
+    return this.usersService.update(+id, data);
   }
 
   @ApiOkResponse({
@@ -99,14 +89,7 @@ export class UsersController {
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
   async deleteOneUser(@Param('id') id: string): Promise<User> {
-    // check if the user exists
-    const user = await this.usersService.findOne(parseInt(id));
-    // if not, return error
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    await this.usersService.delete(parseInt(id));
-    return user;
+    return this.usersService.delete(parseInt(id));
   }
 
   @ApiCreatedResponse({
@@ -116,22 +99,9 @@ export class UsersController {
   async create(@Body() createUser: CreateUser): Promise<User> {
     const created = await this.usersService.create(createUser);
     try {
-      await this.client
-        .emit(
-          'mail',
-          new RmqRecordBuilder({
-            firstName: createUser.firstname,
-            lastName: createUser.lastname,
-            email: 'mael.kerichard@etudiant.univ-rennes1.fr',
-          })
-            .setOptions({
-              contentType: 'application/json',
-            })
-            .build(),
-        )
-        .toPromise();
+      await this.usersService.sendRegistrationConfirmationEmail(created);
     } catch (e) {
-      console.log(e);
+      this.logger.error("Couldn't send registration confirmation message");
     }
 
     return created;
