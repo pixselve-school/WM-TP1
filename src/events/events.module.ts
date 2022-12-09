@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AssociationsModule } from '../associations/associations.module';
+import * as process from 'process';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { AssociationsModule } from '../associations/associations.module';
         name: 'EVENT_NOTIFICATION_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: [process.env.RABBITMQ_URL],
           queue: 'events',
           queueOptions: {
             durable: true,

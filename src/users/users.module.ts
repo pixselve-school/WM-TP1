@@ -17,7 +17,7 @@ import { AssociationsModule } from '../associations/associations.module';
         name: 'REGISTRATION_CONFIRMATION_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: [process.env.RABBITMQ_URL],
           queue: 'registration_confirmation',
           queueOptions: {
             durable: true,
