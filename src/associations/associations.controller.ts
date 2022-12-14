@@ -41,7 +41,10 @@ export class AssociationsController {
     private minutesService: MinutesService,
   ) {}
 
-  @ApiOkResponse({ description: 'All the associations.' })
+  @ApiOkResponse({
+    description: 'All the associations.',
+    type: [AssociationDto],
+  })
   @Get()
   async getAssociations(): Promise<AssociationDto[]> {
     const associations: Association[] =
@@ -55,7 +58,7 @@ export class AssociationsController {
     return associationsDto;
   }
 
-  @ApiOkResponse({ description: 'The association.' })
+  @ApiOkResponse({ description: 'The association.', type: AssociationDto })
   @ApiNotFoundResponse({ description: 'Association not found.' })
   @Get(':id')
   async getOneAssociation(@Param('id') id: string): Promise<AssociationDto> {
@@ -65,14 +68,20 @@ export class AssociationsController {
     return new AssociationDto().from(association, roles);
   }
 
-  @ApiOkResponse({ description: 'The association has been deleted.' })
+  @ApiOkResponse({
+    description: 'The association has been deleted.',
+    type: Association,
+  })
   @ApiNotFoundResponse({ description: 'Association not found.' })
   @Delete(':id')
-  async deleteAssociation(@Param('id') id: string) {
+  async deleteAssociation(@Param('id') id: string): Promise<Association> {
     return this.associationsService.deleteAssociation(+id);
   }
 
-  @ApiOkResponse({ description: 'The association has been updated.' })
+  @ApiOkResponse({
+    description: 'The association has been updated.',
+    type: AssociationDto,
+  })
   @ApiNotFoundResponse({ description: 'Association not found.' })
   @Put(':id')
   async updateAssociation(
@@ -99,7 +108,10 @@ export class AssociationsController {
     return new AssociationDto().from(associationEdited, roles);
   }
 
-  @ApiOkResponse({ description: 'The members of the association.' })
+  @ApiOkResponse({
+    description: 'The members of the association.',
+    type: [AssociationMember],
+  })
   @ApiNotFoundResponse({ description: 'Association not found.' })
   @Get(':id/members')
   async getMembers(@Param('id') id: string): Promise<AssociationMember[]> {
@@ -112,7 +124,10 @@ export class AssociationsController {
     });
   }
 
-  @ApiCreatedResponse({ description: 'The association has been created.' })
+  @ApiCreatedResponse({
+    description: 'The association has been created.',
+    type: AssociationDto,
+  })
   @Post()
   async createAssociation(
     @Body() { name, idUsers }: CreateAssociation,
@@ -126,7 +141,10 @@ export class AssociationsController {
   }
 
   @UsePipes(new ValidationPipe({ transform: true }))
-  @ApiOkResponse({ description: 'The minutes of the association.' })
+  @ApiOkResponse({
+    description: 'The minutes of the association.',
+    type: [Minute],
+  })
   @ApiNotFoundResponse({ description: 'Association not found.' })
   @Get(':id/minutes')
   async minutes(
