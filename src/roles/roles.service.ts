@@ -64,7 +64,10 @@ export class RolesService {
    * @returns all roles
    */
   async findManyByAssociation(association: number): Promise<Role[]> {
-    return this.repository.find({ where: { associationId: association } });
+    return this.repository.find({
+      where: { associationId: association },
+      relations: { association: true, user: true },
+    });
   }
 
   /**

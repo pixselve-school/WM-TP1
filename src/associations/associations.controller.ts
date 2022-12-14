@@ -17,12 +17,7 @@ import { AssociationsService } from './associations.service';
 import UpdateAssociation from './dto/updateAssociation.dto';
 import CreateAssociation from './dto/createAssociation.dto';
 import { UsersService } from '../users/users.service';
-import {
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import AssociationDto from './dto/association.dto';
 import Association from './entities/association.entity';
 import { RolesService } from '../roles/roles.service';
@@ -30,6 +25,7 @@ import { AssociationMember } from './dto/association.member';
 import { Minute } from '../minutes/entities/minute.entity';
 import { MinutesService } from '../minutes/minutes.service';
 import SortParamsDto from './dto/sortParams.dto';
+import { Role } from '../roles/entities/role.entity';
 
 // @UseGuards(AuthGuard('jwt'))
 @ApiTags('associations')
@@ -140,5 +136,15 @@ export class AssociationsController {
     // check if association exists
     await this.associationsService.findOne(id);
     return this.minutesService.getMinutesForAssociation(id, sort, order);
+  }
+
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOkResponse({ description: 'The roles of the association.', type: [Role] })
+  @ApiNotFoundResponse({ description: 'Association not found.' })
+  @Get(':id/roles')
+  async roles(@Param('id') id: number): Promise<Role[]> {
+    // check if association exists
+    await this.associationsService.findOne(id);
+    return this.rolesService.findManyByAssociation(id);
   }
 }
