@@ -38,5 +38,5 @@ export class UpdateUser {
     required: false,
   })
   @IsEmail()
-  email: string;
+  email?: string;
 }
