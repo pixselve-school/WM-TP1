@@ -20,11 +20,11 @@ export class Minute {
   @Column()
   date: Date;
 
-  @ManyToOne(() => Association)
+  @ManyToOne(() => Association, { eager: true })
   @JoinTable()
   association: Association;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, { eager: true })
   @JoinTable()
   voters: User[];
 }
