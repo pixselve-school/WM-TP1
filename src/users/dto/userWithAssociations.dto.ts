@@ -13,6 +13,7 @@ export default class UserWithAssociationsDto extends User {
     this.lastname = user.lastname;
     this.age = user.age;
     this.associations = associations;
+    this.email = user.email;
     return this;
   }
 }

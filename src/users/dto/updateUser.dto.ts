@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail } from 'class-validator';
 
 export class UpdateUser {
   @ApiProperty({
@@ -29,4 +30,13 @@ export class UpdateUser {
     required: false,
   })
   password?: string;
+
+  @ApiProperty({
+    description: 'The email of the user',
+    example: 'user@mail.com',
+    type: String,
+    required: false,
+  })
+  @IsEmail()
+  email: string;
 }
