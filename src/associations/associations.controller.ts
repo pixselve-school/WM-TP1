@@ -104,6 +104,14 @@ export class AssociationsController {
       idParsed,
       association,
     );
+    // delete roles of deleted users
+    if (data.idUsers !== undefined) {
+      const roles = await this.rolesService.findManyByAssociation(idParsed);
+      const rolesToDelete = roles.filter(
+        (role) => !data.idUsers.includes(role.userId),
+      );
+      await this.rolesService.deleteMany(rolesToDelete);
+    }
     const roles = await this.rolesService.findManyByAssociation(idParsed);
     return new AssociationDto().from(associationEdited, roles);
   }

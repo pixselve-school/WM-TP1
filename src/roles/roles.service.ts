@@ -138,7 +138,10 @@ export class RolesService {
         user: true,
       },
     });
-    console.log(roles);
     return roles.map((role) => role.user);
+  }
+
+  async deleteMany(roles: Role[]): Promise<Role[]> {
+    return this.repository.remove(roles);
   }
 }
