@@ -33,6 +33,10 @@ export class EventsService {
     return this.repository.find();
   }
 
+  findAllfromAsso(id: number) {
+    return this.repository.findBy({ association: { id: id} });
+  }
+
   async findOne(id: number) {
     const event = await this.repository.findOne({ where: { id } });
     if (event === null) {
