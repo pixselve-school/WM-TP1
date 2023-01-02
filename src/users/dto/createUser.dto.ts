@@ -40,4 +40,8 @@ export class CreateUser {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+    constructor(data: Partial<CreateUser>) {
+    Object.assign(this, data);
+    }
 }

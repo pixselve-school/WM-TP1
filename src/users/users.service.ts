@@ -17,7 +17,9 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private readonly repository: Repository<User>,
     @Inject('REGISTRATION_CONFIRMATION_SERVICE') private client: ClientProxy,
-  ) {}
+  ) {
+    this.checkEmpty();
+  }
 
   /**
    * Create a new user.
@@ -39,6 +41,21 @@ export class UsersService {
     user.email = createUserData.email;
     user.password = hashedPassword;
     return this.repository.save(user);
+  }
+
+  async checkEmpty(): Promise<void> {
+    if(process.env.DEFAULT_USER_PASS === undefined) return;
+    const users = await this.findAll();
+    if(users.length === 0) {
+      console.log('No users found, creating default user');
+      this.create(new CreateUser({
+        firstname: 'admin',
+        lastname: 'admin',
+        age: 21,
+        email: "admin@administration.fr",
+        password: process.env.DEFAULT_USER_PASS,
+        }));
+    }
   }
 
   /**
