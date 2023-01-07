@@ -41,7 +41,7 @@ export class CreateUser {
   @IsEmail()
   email: string;
 
-    constructor(data: Partial<CreateUser>) {
+  constructor(data: Partial<CreateUser>) {
     Object.assign(this, data);
-    }
+  }
 }

@@ -44,17 +44,19 @@ export class UsersService {
   }
 
   async checkEmpty(): Promise<void> {
-    if(process.env.DEFAULT_USER_PASS === undefined) return;
+    if (process.env.DEFAULT_USER_PASS === undefined) return;
     const users = await this.findAll();
-    if(users.length === 0) {
+    if (users.length === 0) {
       console.log('No users found, creating default user');
-      this.create(new CreateUser({
-        firstname: 'admin',
-        lastname: 'admin',
-        age: 21,
-        email: "admin@administration.fr",
-        password: process.env.DEFAULT_USER_PASS,
-        }));
+      await this.create(
+        new CreateUser({
+          firstname: 'admin',
+          lastname: 'admin',
+          age: 21,
+          email: 'admin@administration.fr',
+          password: process.env.DEFAULT_USER_PASS,
+        }),
+      );
     }
   }
 

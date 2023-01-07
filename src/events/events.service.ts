@@ -34,7 +34,7 @@ export class EventsService {
   }
 
   findAllfromAsso(id: number) {
-    return this.repository.findBy({ association: { id: id} });
+    return this.repository.findBy({ association: { id: id } });
   }
 
   async findOne(id: number) {
