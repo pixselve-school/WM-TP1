@@ -58,3 +58,34 @@ The configuration is done through environment variables. You can find the list o
 npm run build
 npm run start
 ```
+
+## 🏠 Architecture
+
+![](http://www.plantuml.com/plantuml/svg/jPJ1JiCm38RlUGephkp8WPvstJCWc4nZDeichX9l227UdQQPnAAi4wWiqwhAJhx_Z_MhgwWOTEywOsvqHuwWxv2zKUb11Lv4LHnO3jGgYpVnZNsF0Hrqx4a_UW89kXDZsWvZXE4lBMFQ2vy603mwQk20eTrXI0Ms3R1Nsb8mN_MfpJvIYECp0qvwwvEZ093shC_Gw41U9zJ7wpQWx6XuTNsgaRT5PK9pqhrZlrVAWgqCJQ-5faMbVn3O74JBqUJwBwSIfADwAEUEL0Phs8y7SiXTGHisQ2Nnok5C5RTKgFO3-rs2lH0OCv4LM3xUtZ-atzsOuAVbSt4BE5aDBChxiLtyYPixvShSr3a2SmohDTleCMvNuXOfc-GM7Wfkxbn4pfZf6E8hpBJcpZIw8c_JL_KR)
+
+This database architecture is designed to track and organize information about associations, users, events, minutes, and
+roles.
+
+The `association`, `event`, `minute`, and `role` entities each have a many-to-one relationship with the `association`
+entity, as they each contain a foreign key to the association table. This allows events, minutes, and roles to be
+organized and tracked by association.
+
+The `association` and `user` entities have a many-to-many relationship, which is represented by
+the `association_users_user` junction table. This junction table allows multiple users to be associated with multiple
+associations, and vice versa.
+
+The `minute_voters_user` junction table represents a many-to-many relationship between the `minute` and `user` entities,
+allowing multiple users to vote on multiple minutes.
+
+### API
+
+We have created a REST API for the database described in the schema above. In designing the API, we chose to stay
+closely aligned with the structure of the database in order to make it easy to understand and use.
+
+One of the main reasons for this decision was to maintain consistency between the database and the API. By using a
+similar structure for both, it is easier for developers to understand how the data is organized and how to access it
+through the API.
+
+Additionally, staying closely aligned with the database structure allows us to leverage the existing relationships
+between the entities in the database, such as the many-to-many relationships between associations and users, or between
+minutes and voters. This can simplify the design of the API and make it more intuitive for users.
