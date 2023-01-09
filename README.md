@@ -17,7 +17,7 @@ We released a Docker image for anyone to use. It is available
 on [GitHub Packages](https://github.com/pixselve-school/tp1-wm/pkgs/container/tp1-wm).
 
 ```bash
-docker run -p 3000:3000 ghcr.io/pixselve-school/tp1-wm:master
+docker run -p 3000:3000 ghcr.io/pixselve-school/tp1-wm:master --env-file .env
 ```
 
 Or use a `docker-compose.yml` file:
