@@ -176,6 +176,13 @@ export class UsersService {
     return this.repository.findBy({ id: In(ids) });
   }
 
+  /**
+   * Send a registration confirmation email to the given user.
+   * @param email the user email
+   * @param firstname the user firstname
+   * @param lastname the user lastname
+   * @param verificationToken the verification token
+   */
   async sendRegistrationConfirmationEmail({
     email,
     firstname,
