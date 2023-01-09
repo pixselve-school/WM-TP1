@@ -1,15 +1,16 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as swStats from "swagger-stats";
+import * as swStats from 'swagger-stats';
 import helmet from 'helmet';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import * as apiSpecif from "./swagger-specif/swagger-spec.json";
+import * as apiSpecif from './swagger-specif/swagger-spec.json';
+
 //import * as fs from "fs"; // use to generate swagger-spec.json
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(swStats.getMiddleware({swaggerSpec:apiSpecif}));
+  app.use(swStats.getMiddleware({ swaggerSpec: apiSpecif }));
   const config = new DocumentBuilder()
     .setTitle('Gestion des Associations')
     .setDescription('Descriptions des APIs de la gestion des associations')

@@ -27,7 +27,7 @@ export class EventsController {
     return this.eventsService.findAll();
   }
 
-  @Get("association/:id")
+  @Get('association/:id')
   findAllinAssociation(@Param('id') id: string) {
     return this.eventsService.findAllfromAsso(+id);
   }

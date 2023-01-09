@@ -66,15 +66,16 @@ export class UsersService {
   async checkEmpty(): Promise<void> {
     if(process.env.DEFAULT_USER_PASS === undefined || process.env.DEFAULT_USER_EMAIL === undefined) return;
     const users = await this.findAll();
-    if(users.length === 0) {
+    if (users.length === 0) {
       console.log('No users found, creating default user');
-      let newUser = await this.create(new CreateUser({
-        firstname: 'admin',
-        lastname: 'admin',
-        age: 21,
-        email: "admin@administration.fr",
-        password: process.env.DEFAULT_USER_PASS,
-        }));
+      let newUser = await this.create(
+          new CreateUser({
+            firstname: 'admin',
+            lastname: 'admin',
+            age: 21,
+            email: process.env.DEFAULT_USER_EMAIL,
+            password: process.env.DEFAULT_USER_PASS,
+          }));
       newUser.verified = true;
       this.repository.save(newUser);
     }

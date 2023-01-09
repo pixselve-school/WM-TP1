@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,6 +10,7 @@ import {
   Param,
   Post,
   Put,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { User } from './entities/user.entity';
@@ -16,6 +18,7 @@ import { CreateUser } from './dto/createUser.dto';
 import { UpdateUser } from './dto/updateUser.dto';
 import { UsersService } from './users.service';
 import {
+  ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -84,11 +87,16 @@ export class UsersController {
     description: 'The user has been successfully deleted.',
   })
   @ApiNotFoundResponse({
-    description: 'User not found',
+    description: 'User not found.',
   })
+  @ApiBadRequestResponse({ description: 'Can not delete yourself.' })
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  async deleteOneUser(@Param('id') id: string): Promise<User> {
+  async deleteOneUser(@Param('id') id: string, @Request() req): Promise<User> {
+    // check if logged user != user to delete
+    if (req.user.username === +id) {
+      throw new BadRequestException('You cannot delete yourself');
+    }
     return this.usersService.delete(parseInt(id));
   }
 
