@@ -23,8 +23,12 @@ export class AuthService {
 
   async login(user: User) {
     const payload = { username: user.email };
+    let userID: number = 1;
+    const user_ = await this.userService.findOneByEmail(user.email, true);
+    if (user_ !== undefined) userID = user_.id;
     return {
       access_token: this.jwtService.sign(payload),
+      id: userID,
     };
   }
 }
