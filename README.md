@@ -51,14 +51,15 @@ SMTP server in the [projet-al](https://github.com/pixselve-school/projet-al) rep
 
 ### Environment variables
 
-| Name                | Value                                                                                   | Example                          | Required |
-|---------------------|-----------------------------------------------------------------------------------------|----------------------------------|----------|
-| `DB_HOST`           | The host of the database. It should be a PostgreSQL database.                           | 127.0.0.1                        | ✅        |
-| `DB_USERNAME`       | The username of the database.                                                           | postgres                         | ✅        |
-| `DB_PASSWORD`       | The password of the database.                                                           | postgres                         | ✅        |
-| `DB_DATABASE`       | The name of the database.                                                               | postgres                         | ✅        |
-| `DEFAULT_USER_PASS` | If the database is empty, a default user with ID `1` and the ENV value will be created. | admin                            | ✅        |
-| `RABBITMQ_URL`      | The url pointing to a RabbitMQ instance.                                                | amqp://guest:guest@rabbitmq:5672 | ❌        |
+| Name                 | Value                                                                        | Example                          | Required |
+|----------------------|------------------------------------------------------------------------------|----------------------------------|----------|
+| `DB_HOST`            | The host of the database. It should be a PostgreSQL database.                | 127.0.0.1                        | ✅        |
+| `DB_USERNAME`        | The username of the database.                                                | postgres                         | ✅        |
+| `DB_PASSWORD`        | The password of the database.                                                | postgres                         | ✅        |
+| `DB_DATABASE`        | The name of the database.                                                    | postgres                         | ✅        |
+| `DEFAULT_USER_EMAIL` | If the database is empty, a default user with this email will be created.    | admin@administration.fr          | ✅        |
+| `DEFAULT_USER_PASS`  | If the database is empty, a default user with this password will be created. | admin                            | ✅        |
+| `RABBITMQ_URL`       | The url pointing to a RabbitMQ instance.                                     | amqp://guest:guest@rabbitmq:5672 | ❌        |
 
 ## 🧱 Build from source
 
@@ -90,7 +91,7 @@ npm run start
 
 ## 🏠 Architecture
 
-![](http://www.plantuml.com/plantuml/svg/jPJ1JiCm38RlUGephkp8WPvstJCWc4nZDeichX9l227UdQQPnAAi4wWiqwhAJhx_Z_MhgwWOTEywOsvqHuwWxv2zKUb11Lv4LHnO3jGgYpVnZNsF0Hrqx4a_UW89kXDZsWvZXE4lBMFQ2vy603mwQk20eTrXI0Ms3R1Nsb8mN_MfpJvIYECp0qvwwvEZ093shC_Gw41U9zJ7wpQWx6XuTNsgaRT5PK9pqhrZlrVAWgqCJQ-5faMbVn3O74JBqUJwBwSIfADwAEUEL0Phs8y7SiXTGHisQ2Nnok5C5RTKgFO3-rs2lH0OCv4LM3xUtZ-atzsOuAVbSt4BE5aDBChxiLtyYPixvShSr3a2SmohDTleCMvNuXOfc-GM7Wfkxbn4pfZf6E8hpBJcpZIw8c_JL_KR)
+![](http://www.plantuml.com/plantuml/svg/jLB1JiCm3BtdAyouiYC7UjfrTsu8fgpnDcj9NALk4KByEqs3j4LP9r1PgbRLi_tUY_LMhUWWdRFgJWxe41ghoIlX1eHXooBim530MeYzQe_a6nsq0qiUvQD1u207LggskcrXUBac7NlXKm60rmuhw7Me3pf4W4m5v0Nt6DHNERNfMWpj-4q4PxNrQJHMOi_w0Xlsw6L2VRnj1K8EXr_NH0ozoP4fpGdtZdmdc0Hh7efUCasZ1Vz1ODEpvAj9-2-t4jZYvQKK8uN1Wkpa0Pqccx4D3L98x2XSGFKUCzLcu7xdOBAc7WFj20TmosnH-nDOZmQV-OZ-IiRKHBnW-NB_-1IVXp7qhyktxE9mTYfOv2iXi_WJRwgaa_F6oWzXIcvvvXfDGRaHRnRCQTxCGyQRAbSfP-nqpFqDTbhopZIwGcywPxy1)
 
 This database architecture is designed to track and organize information about associations, users, events, minutes, and
 roles.
