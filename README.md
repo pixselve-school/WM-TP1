@@ -20,6 +20,35 @@ on [GitHub Packages](https://github.com/pixselve-school/tp1-wm/pkgs/container/tp
 docker run -p 3000:3000 ghcr.io/pixselve-school/tp1-wm:master
 ```
 
+Or use a `docker-compose.yml` file:
+
+```yaml
+version: "3.9"
+services:
+  backend:
+    image: ghcr.io/pixselve-school/tp1-wm:master
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=postgres
+      - DEFAULT_USER_PASS=admin
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+```
+
+You can find a complete docker compose file including the frontend and backend, a RabbitMQ instance, a PostgreSQL and a
+SMTP server in the [projet-al](https://github.com/pixselve-school/projet-al) repository.
+
 ### Environment variables
 
 | Name                | Value                                                                                   | Example                          | Required |
