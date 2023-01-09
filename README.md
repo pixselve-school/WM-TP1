@@ -37,6 +37,8 @@ services:
       - DB_PASSWORD=postgres
       - DB_DATABASE=postgres
       - DEFAULT_USER_PASS=admin
+      - DEFAULT_USER_EMAIL=admin@administration.fr
+      - FRONTEND_URL=http://localhost:4200/
   db:
     image: postgres
     restart: always
@@ -47,7 +49,7 @@ services:
 ```
 
 You can find a complete docker compose file including the frontend and backend, a RabbitMQ instance, a PostgreSQL and a
-SMTP server in the [projet-al](https://github.com/pixselve-school/projet-al) repository.
+SMTP server in the [projet-al](https://github.com/pixselve-school/projet-al) repository. (REQUIRED for feature like : email verification)
 
 ### Environment variables
 
