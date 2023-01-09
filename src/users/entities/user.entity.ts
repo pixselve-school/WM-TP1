@@ -19,4 +19,12 @@ export class User extends BaseEntity {
   @Column()
   @Exclude()
   password: string;
+
+  @Column()
+  @Exclude()
+  verified: boolean;
+
+  @Column({ unique: true })
+  @Exclude()
+  verificationToken: string;
 }

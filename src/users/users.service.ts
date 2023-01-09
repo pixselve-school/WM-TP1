@@ -1,7 +1,7 @@
 import {
-  BadRequestException,
+  BadRequestException, HttpException,
   Inject,
-  Injectable,
+  Injectable, Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { User } from './entities/user.entity';
@@ -20,6 +20,8 @@ export class UsersService {
   ) {
     this.checkEmpty();
   }
+
+  private logger = new Logger('UsersService');
 
   /**
    * Create a new user.
@@ -40,21 +42,41 @@ export class UsersService {
     user.age = createUserData.age;
     user.email = createUserData.email;
     user.password = hashedPassword;
+    user.verified = false;
+    user.verificationToken = this.generateVerificationToken(16);
     return this.repository.save(user);
   }
 
+  /**
+   * Generate a random string of the given length.
+   * @param n the length of the string
+   */
+  generateVerificationToken(n: number) : string {
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let token = '';
+    for (let i = 0; i < n; i++) {
+      token += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return token;
+  }
+
+  /**
+   * Check if the database contains a user, if not, create one.
+   */
   async checkEmpty(): Promise<void> {
-    if(process.env.DEFAULT_USER_PASS === undefined) return;
+    if(process.env.DEFAULT_USER_PASS === undefined || process.env.DEFAULT_USER_EMAIL === undefined) return;
     const users = await this.findAll();
     if(users.length === 0) {
       console.log('No users found, creating default user');
-      this.create(new CreateUser({
+      let newUser = await this.create(new CreateUser({
         firstname: 'admin',
         lastname: 'admin',
         age: 21,
         email: "admin@administration.fr",
         password: process.env.DEFAULT_USER_PASS,
         }));
+      newUser.verified = true;
+      this.repository.save(newUser);
     }
   }
 
@@ -85,6 +107,43 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('user not found');
     }
+    return user;
+  }
+
+  /**
+   * Find one user by email.
+   * @param email the user email
+   * @returns the user found
+   * @throws {NotFoundException} if the user is not found
+   */
+  async findOneByEmail(email: string, mustBeVerified: boolean): Promise<User | null> {
+    let user = await this.repository.findOneBy({ email: email });
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+    if(mustBeVerified && !user.verified){
+      throw new HttpException('user not verified', 403);
+    }
+    return user;
+  }
+
+  /**
+   * Verify one user (not verified) with the given verification token.
+   * @param token the token
+   * @returns the user verified
+   * @throws {NotFoundException} if the user is not found
+   * @throws {BadRequestException} if the user is already verified
+   */
+  async verifyUser(token: string): Promise<User | null> {
+    const user = await this.repository.findOneBy({ verificationToken: token });
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+    if(user.verified){
+        throw new HttpException('user already verified', 403);
+    }
+    user.verified = true;
+    this.repository.save(user);
     return user;
   }
 
@@ -121,10 +180,16 @@ export class UsersService {
     email,
     firstname,
     lastname,
+    verificationToken,
   }: User): Promise<void> {
+    if(process.env.FRONTEND_URL === undefined) {
+        this.logger.error("Couldn't send registration confirmation message. process.env.FRONTEND_URL is undefined");
+        return;
+    }
     const record = new RmqRecordBuilder({
       firstName: firstname,
       lastName: lastname,
+      validationUrl: process.env.FRONTEND_URL + "verify?t=" + verificationToken,
       email,
     })
       .setOptions({

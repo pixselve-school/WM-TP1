@@ -13,6 +13,7 @@ import { MinutesModule } from './minutes/minutes.module';
 import { Minute } from './minutes/entities/minute.entity';
 import { EventsModule } from './events/events.module';
 import { Event } from './events/entities/event.entity';
+import { VerificationModule } from './verification/verification.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { Event } from './events/entities/event.entity';
     RolesModule,
     MinutesModule,
     EventsModule,
+    VerificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
