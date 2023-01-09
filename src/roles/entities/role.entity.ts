@@ -7,7 +7,7 @@ export class Role {
   @Column()
   name: string;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { createForeignKeyConstraints: false }) // don't put the foreign key in the association table
   @JoinColumn({ name: 'userId' })
   user: User;
 
@@ -17,7 +17,7 @@ export class Role {
   @PrimaryColumn({ unique: false })
   associationId: number;
 
-  @OneToOne(() => Association)
+  @OneToOne(() => Association, { createForeignKeyConstraints: false }) // don't put the foreign key in the association table
   @JoinColumn({ name: 'associationId' })
   association: Association;
 }
